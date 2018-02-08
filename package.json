@@ -1,0 +1,16 @@
+{
+  "name": "socketiochat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "Khalil Rahmani <khalil.rahmani.pro@gmail.com> (https://www.linkedin.com/in/khalilrahmani/)",
+  "license": "MIT",
+  "dependencies": {
+    "express": "*",
+    "socket.io": "^2.0.4"
+  }
+}

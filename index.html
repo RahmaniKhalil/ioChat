@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>ioChat</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+  <style>
+    #messageArea{
+      display: none;
+    }
+  </style>
+</head>
+<body>
+    <nav class="teal">
+        <div class="container">
+          <a href="#" class="brand-logo">ioChat</a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <!-- <li><a href="sass.html">Sass</a></li>
+            <li><a href="badges.html">Components</a></li>
+            <li><a href="collapsible.html">JavaScript</a></li> -->
+          </ul>
+        </div>
+    </nav>
+
+      <div class="container">
+        <div id="userFormArea" class="row">
+          <div class="col s12">
+              <form id="loginForm">
+                  <div class="row">
+                      <div class="input-field col s10">
+                          <input name="username" id="username" type="text" placeholder="Enter Username">
+                      </div>
+                      <div class="input-field col s2">
+                          <input value="Login" type="submit" class="red btn">
+                      </div>
+                  </div>
+              </form>
+          </div>
+        </div>
+        <div id="messageArea" class="row">
+          <div class="col s3">
+            <ul class="collection">
+              <li class="collection-item active">Connected users</li>
+              <div id="users"></div>
+            </ul>
+          </div>
+          <div class="col s9">
+            <form id="messageForm">
+                <div class="row">
+                    <div class="input-field col s10">
+                        <input name="name" id="message" type="text" placeholder="Message">
+                    </div>
+                    <div class="input-field col s2">
+                        <input value="Send" type="submit" class="btn">
+                    </div>
+                </div>
+            </form>
+            <div id="chat"></div>
+            
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.5/socket.io.min.js"></script>
+      <script>
+
+
+          $(function() {
+            const socket = io.connect();
+            var $messageForm = $('#messageForm');
+            var $loginForm = $('#loginForm');
+            var $userFormArea = $('#userFormArea');
+            var $messageArea = $('#messageArea');
+            var $message = $('#message');
+            var $chat = $('#chat');
+            var $username = $('#username');
+            var $users = $('#users');
+
+            // When the form is submited
+            $messageForm.submit(function(e) {
+              e.preventDefault();
+              
+              //Send the message to the server
+              socket.emit('send message', $message.val());
+              $message.val('');
+            });
+
+            //new user connected
+            $loginForm.submit(function(e) {
+              e.preventDefault();
+              
+              //Send the message to the server
+              socket.emit('new user', $username.val(), (data) => {
+                if (data) {
+                  $userFormArea.hide();
+                  $messageArea.show();
+                }
+              });
+              $username.val('');
+            });
+
+            socket.on('get users', (data) => {
+              var html = '';
+              data.forEach(user => {
+                html += '<li class="collection-item">'+user+'</li>';
+              });
+              
+              $users.html(html);
+
+            });
+
+            socket.on('new message', (data) => {
+              $chat.append(`
+                <div class="card-panel teal lighten-3">
+                  <span class="white-text" id="cht"><strong> `+data.user+`: </strong>`
+                    + 
+                  data.msg
+                    +
+                  `</span>
+              </div>
+              `);
+            });
+
+
+          });
+        
+        
+      </script>
+</body>
+</html>
